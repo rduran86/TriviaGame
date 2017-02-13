@@ -1,10 +1,15 @@
 body{
-	background-image: url("https://aos.iacpublishinglabs.com/question/aq/700px-394px/demands-answer-asks-question_11a663c8a10f423.jpg?domain=cx.aos.ask.com");
-	background-size: cover;
+	background-image: url("http://st.depositphotos.com/1009487/1245/i/950/depositphotos_12451809-Question-mark-texture.jpg");
+	/*background-size: cover;*/
 }
 
 .container{
 
 	margin-top: 50px;
 	max-width: 60%;
+}
+
+.title{
+	background-color: black !important;
+	color: white !important;
 }

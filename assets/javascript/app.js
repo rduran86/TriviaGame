@@ -35,11 +35,17 @@ var trivia = {
 	option1:"",
 	option2:"",
 	option3:"",
-	answeredQuestions: 0,
+	askedQuestions: [],
+	questionAnswered: false,
 
 	//methods
 	start: function(){
-		trivia.choices();
+		$("#start").show();
+		$("#start").html("Start");
+		$("#question").hide();
+		$("#option1").hide();
+		$("#option2").hide();
+		$("#option3").hide();
 	},
 
 	changeQuestion: function(newQuestion, option1, option2, option3){
@@ -63,10 +69,34 @@ var trivia = {
 
 	choices:function(){	
 
+		//pick a random number betwen 1 and 5 
 		trivia.randomQuestion = Math.floor(Math.random() * 6);
+		
+		// Check if the random number is on the asked questions array
+		for (i= 0; i < trivia.askedQuestions.length; i++){
+			if(trivia.randomQuestion === trivia.askedQuestions[i]){
+				trivia.questionAnswered = true;
+				break;
+			}
+			else{
+				trivia.questionAnswered = false;
+			}
+		}
+
 		//if the random number for the question is 0 pick again
-		while(trivia.randomQuestion === 0){
+		while(trivia.randomQuestion === 0 || trivia.questionAnswered){
 			trivia.randomQuestion = Math.floor(Math.random() * 6);
+			// Check if the random number is on the asked questions array
+			for (i= 0; i < trivia.askedQuestions.length; i++){
+				if(trivia.randomQuestion === trivia.askedQuestions[i]){
+					trivia.questionAnswered = true;
+					break;
+				}
+				else{
+					trivia.questionAnswered = false;
+				}
+			}
+
 		}
 		console.log(trivia.randomQuestion);
 		switch(trivia.randomQuestion){
@@ -110,7 +140,9 @@ var trivia = {
 			
 		}	
 		trivia.changeQuestion(trivia.question, trivia.option1, trivia.option2, trivia.option3);
-			console.log(trivia.question);
+		//Push the random question into the asked questions array 
+		trivia.askedQuestions.push(trivia.randomQuestion);
+		console.log(trivia.question);
 }
 		
 
@@ -120,21 +152,29 @@ var trivia = {
 window.onload = function(){	
 
 	userChoice = "";
-	//start the game with a random question
-	trivia.choices();	
-	//Get user choice
-		 
+	//start 
+	trivia.start();	
+			 
 	// if the user takes more than 8 seconds to choose option question will change
 	// intervalId = setTimeout(function(){
 	// 	trivia.choices();
-	// } , 8000)	
+	// } , 8000)
+	$("#start").on("click", function(){
+		trivia.choices();
+		$("#start").hide();
+		$("#question").show();
+		$("#option1").show();
+		$("#option2").show();
+		$("#option3").show();
+
+	});
+
 
 	$("#option1").on("click", function(){
-		if(trivia.answeredQuestions < 5){
-	
+		if(trivia.askedQuestions.length < 5){
+			//Get user choice
 			userChoice = trivia.option1;
 			console.log(userChoice);
-			trivia.answeredQuestions ++;
 
 		// Check if user chose the correct answer 
 		if(trivia.randomQuestion === 1){
@@ -146,7 +186,9 @@ window.onload = function(){
 			else{
 				$("#question").html("Better luck next time")
 				trivia.incorrectAnswers ++;
-				setTimeout(trivia.choices, 2000);
+				setTimeout(function(){
+					$("#question").html("The correct answer is : " + trivia.answer1);},1000);
+				setTimeout(trivia.choices, 3000);
 			}
 				
 		}
@@ -159,7 +201,9 @@ window.onload = function(){
 			else{
 				$("#question").html("Better luck next time")
 				trivia.incorrectAnswers ++;
-				setTimeout(trivia.choices, 2000);
+				setTimeout(function(){
+					$("#question").html("The correct answer is : " + trivia.answer2);},1000);
+				setTimeout(trivia.choices, 3000);
 			}
 		
 		}
@@ -173,7 +217,9 @@ window.onload = function(){
 			else{
 				$("#question").html("Better luck next time")
 				trivia.incorrectAnswers ++;
-				setTimeout(trivia.choices, 2000);
+				setTimeout(function(){
+					$("#question").html("The correct answer is : " + trivia.answer3);},1000);
+				setTimeout(trivia.choices, 3000);
 			}
 		
 		
@@ -188,7 +234,9 @@ window.onload = function(){
 			else{
 				$("#question").html("Better luck next time")
 				trivia.incorrectAnswers ++;
-				setTimeout(trivia.choices, 2000);
+				setTimeout(function(){
+					$("#question").html("The correct answer is : " + trivia.answer4);},1000);
+				setTimeout(trivia.choices, 3000);
 			}
 		
 		}
@@ -202,7 +250,9 @@ window.onload = function(){
 			else{
 				$("#question").html("Better luck next time")
 				trivia.incorrectAnswers ++;
-				setTimeout(trivia.choices, 2000);
+				setTimeout(function(){
+					$("#question").html("The correct answer is : " + trivia.answer5);},1000);
+				setTimeout(trivia.choices, 3000);
 				}
 			
 			}
@@ -214,10 +264,9 @@ window.onload = function(){
 
 	$("#option2").on("click", function(){
 
-	if(trivia.answeredQuestions < 5){
+	if(trivia.askedQuestions.length < 5){
 	
 		userChoice = trivia.option2;
-		trivia.answeredQuestions ++;
 		// Check if user chose the correct answer 
 		if(trivia.randomQuestion === 1){
 			if(trivia.answer1 === userChoice){
@@ -228,7 +277,9 @@ window.onload = function(){
 			else{
 				$("#question").html("Better luck next time")
 				trivia.incorrectAnswers ++;
-				setTimeout(trivia.choices, 2000);
+				setTimeout(function(){
+					$("#question").html("The correct answer is : " + trivia.answer1);},1000);
+				setTimeout(trivia.choices, 3000);
 			}
 		
 		}
@@ -242,7 +293,9 @@ window.onload = function(){
 		else{
 			$("#question").html("Better luck next time")
 			trivia.incorrectAnswers ++;
-			setTimeout(trivia.choices, 2000);
+			setTimeout(function(){
+				$("#question").html("The correct answer is : " + trivia.answer2);},1000);
+			setTimeout(trivia.choices, 3000);
 		}
 	
 	}
@@ -256,7 +309,9 @@ window.onload = function(){
 		else{
 			$("#question").html("Better luck next time")
 			trivia.incorrectAnswers ++;
-			setTimeout(trivia.choices, 2000);
+			setTimeout(function(){
+				$("#question").html("The correct answer is : " + trivia.answer3);},1000);
+			setTimeout(trivia.choices, 3000);
 		}
 	
 	}
@@ -270,7 +325,9 @@ window.onload = function(){
 		else{
 			$("#question").html("Better luck next time")
 			trivia.incorrectAnswers ++;
-			setTimeout(trivia.choices, 2000);
+			setTimeout(function(){
+				$("#question").html("The correct answer is : " + trivia.answer4);},1000);
+			setTimeout(trivia.choices, 3000);
 		}
 	
 			
@@ -285,7 +342,9 @@ window.onload = function(){
 		else{
 			$("#question").html("Better luck next time")
 			trivia.incorrectAnswers ++;
-			setTimeout(trivia.choices, 2000);
+			setTimeout(function(){
+				$("#question").html("The correct answer is : " + trivia.answer5);},1000);
+			setTimeout(trivia.choices, 3000);
 		}
 		
 		}
@@ -299,10 +358,9 @@ window.onload = function(){
 
 	$("#option3").on("click", function(){
 
-	if(trivia.answeredQuestions < 5){
+	if(trivia.askedQuestions.length < 5){
 
 		userChoice = trivia.option3;
-		trivia.answeredQuestions ++;
 
 		// Check if user chose the correct answer 
 	if(trivia.randomQuestion === 1){
@@ -314,7 +372,9 @@ window.onload = function(){
 		else{
 			$("#question").html("Better luck next time")
 			trivia.incorrectAnswers ++;
-			setTimeout(trivia.choices, 2000);
+			setTimeout(function(){
+				$("#question").html("The correct answer is : " + trivia.answer1);},1000);
+			setTimeout(trivia.choices, 3000);
 		}
 
 	}
@@ -328,7 +388,9 @@ window.onload = function(){
 		else{
 			$("#question").html("Better luck next time")
 			trivia.incorrectAnswers ++;
-			setTimeout(trivia.choices, 2000);
+			setTimeout(function(){
+				$("#question").html("The correct answer is : " + trivia.answer2);},1000);
+			setTimeout(trivia.choices, 3000);
 		}
 	
 
@@ -343,7 +405,9 @@ window.onload = function(){
 		else{
 			$("#question").html("Better luck next time")
 			trivia.incorrectAnswers ++;
-			setTimeout(trivia.choices, 2000);
+			setTimeout(function(){
+				$("#question").html("The correct answer is : " + trivia.answer3);},1000);
+			setTimeout(trivia.choices, 3000);
 		}
 				
 	}
@@ -352,12 +416,14 @@ window.onload = function(){
 		if(trivia.answer4 === userChoice){
 			$("#question").html("Correct!")
 			trivia.correctAnswers ++;
-			setTimeout(trivia.choices, 2000);	
+			setTimeout(trivia.choices, 3000);	
 		}
 		else{
 			$("#question").html("Better luck next time")
 			trivia.incorrectAnswers ++;
-			setTimeout(trivia.choices, 2000);
+			setTimeout(function(){
+				$("#question").html("The correct answer is : " + trivia.answer4);},1000);
+			setTimeout(trivia.choices, 3000);
 		}
 	
 	}
@@ -366,12 +432,14 @@ window.onload = function(){
 		if(trivia.answer5 === userChoice){
 			$("#question").html("Correct!")
 			trivia.correctAnswers ++;		
-			setTimeout(trivia.choices, 2000);
+			setTimeout(trivia.choices, 3000);
 		}
 		else{
 			$("#question").html("Better luck next time")
 			trivia.incorrectAnswers ++;
-			setTimeout(trivia.choices, 2000);
+			setTimeout(function(){
+				$("#question").html("The correct answer is : " + trivia.answer5);},1000);
+			setTimeout(trivia.choices, 3000);
 		}
 	
 	}		
@@ -382,10 +450,10 @@ window.onload = function(){
 	}
 
 
-	if(trivia.answeredQuestions == 5){
+	if(trivia.askedQuestions.length == 5){
 		trivia.correctAnswers = 0
 		trivia.incorrectAnswers = 0
-		trivia.answeredQuestions = 0
+		trivia.askedQuestions = [];
 		$("#option2").removeClass("btn-danger");
 		trivia.choices();
 	}	
