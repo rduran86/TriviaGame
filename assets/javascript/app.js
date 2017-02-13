@@ -25,9 +25,9 @@ var trivia = {
 	question3: "What falls but never breaks and what breaks but never falls?",
 	answer3: "The night and day",
 	question4: "What demands an answer but asks no question?",
-	answer4: "telephone",
+	answer4: "The telephone",
 	question5: "What is so fragile that when you say its name you break it?",
-	answer5: "silence",
+	answer5: "The silence",
 	correctAnswers: 0,
 	incorrectAnswers: 0,
 	randomQuestion: 0,
@@ -79,9 +79,9 @@ var trivia = {
 			
 			case 2:
 			trivia.question = trivia.question2;
-			trivia.option1 = "sponje";
+			trivia.option1 = "The sponje";
 			trivia.option2 = trivia.answer2;
-			trivia.option3 = "sand"; 
+			trivia.option3 = "The sand"; 
 			break;
 
 			case 3:
@@ -101,8 +101,8 @@ var trivia = {
 			case 5:
 			trivia.question = trivia.question5;
 			trivia.option1 = trivia.answer5;
-			trivia.option2 = "crstal";
-			trivia.option3 = "rose"; 
+			trivia.option2 = "The crystal";
+			trivia.option3 = "The rose"; 
 			break;
 
 			default:
