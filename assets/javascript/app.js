@@ -37,7 +37,8 @@ var trivia = {
 	option3:"",
 	askedQuestions: [],
 	questionAnswered: false,
-
+	count: 10,
+	unanswered: 0,
 	//methods
 	start: function(){
 		$("#start").show();
@@ -46,6 +47,7 @@ var trivia = {
 		$("#option1").hide();
 		$("#option2").hide();
 		$("#option3").hide();
+		$("#unanswered").hide();
 	},
 
 	changeQuestion: function(newQuestion, option1, option2, option3){
@@ -65,6 +67,9 @@ var trivia = {
 		$("#option2").addClass("btn-danger");
 		$("#option2").html("incorrect answers: " + trivia.incorrectAnswers);
 		$("#option3").html("Play again?");
+		$("#timeRemaining").empty();
+		$("#unanswered").show();
+		$("#unanswered").html("Unanswered questions: " + trivia.unanswered);
 	},
 
 	choices:function(){	
@@ -143,6 +148,7 @@ var trivia = {
 		//Push the random question into the asked questions array 
 		trivia.askedQuestions.push(trivia.randomQuestion);
 		console.log(trivia.question);
+		trivia.count = 10;
 }
 		
 
@@ -152,13 +158,59 @@ var trivia = {
 window.onload = function(){	
 
 	userChoice = "";
+	var counter;
+
+	//timer function
+	function timer(){
+		trivia.count -= 1;
+		if(trivia.count === 0){
+			trivia.unanswered++;
+			$("#timeRemaining").html("Time is up");
+			//clearInerval(counter);
+			//Show the correct answer if the time is up 
+			switch(trivia.randomQuestion){
+			case 1:	
+			$("#question").html("The correct answer was " + trivia.answer1 );
+			break;
+			case 2:	
+			$("#question").html("The correct answer was " + trivia.answer2 );
+			break;
+			case 3:	
+			$("#question").html("The correct answer was " + trivia.answer3 );
+			break;
+			case 4:	
+			$("#question").html("The correct answer was " + trivia.answer4 );
+			break;
+			case 5:	
+			$("#question").html("The correct answer was " + trivia.answer5 );
+			break;
+			default:
+			break;
+
+		}
+		if(trivia.askedQuestions.length === 5){
+			console.log(trivia.askedQuestions);
+			trivia.finalScreen();
+
+		}
+		else{
+		setTimeout(function(){
+				$("#timeRemaining").empty();
+				trivia.choices();
+			}, 3000)
+		} //closing bracket for trivia.askedQuestions length equals  0
+
+		}// closing bracket for if trivia count equals 0
+		if(trivia.count > 0){
+		$("#timeRemaining").html("Time Remaining " + trivia.count + " seconds" );
+		}
+		}
+	//counter variable to call timer function every second
+	
+
 	//start 
 	trivia.start();	
-			 
-	// if the user takes more than 8 seconds to choose option question will change
-	// intervalId = setTimeout(function(){
-	// 	trivia.choices();
-	// } , 8000)
+	
 	$("#start").on("click", function(){
 		trivia.choices();
 		$("#start").hide();
@@ -167,11 +219,20 @@ window.onload = function(){
 		$("#option2").show();
 		$("#option3").show();
 
+		counter = setInterval(timer, 1000);
+
 	});
 
 
 	$("#option1").on("click", function(){
+		//clear content on time remaining 
+		$("#timeRemaining").empty();
+		// set count to 0 so to avoid writing to #timeRemaining
+		trivia.count = 0;	
+
+
 		if(trivia.askedQuestions.length < 5){
+			
 			//Get user choice
 			userChoice = trivia.option1;
 			console.log(userChoice);
@@ -263,8 +324,13 @@ window.onload = function(){
 	});
 
 	$("#option2").on("click", function(){
+		//clear content on time remaining 
+		$("#timeRemaining").empty();
+		// set count to 0 so to avoid writing to #timeRemaining
+		trivia.count = 0;	
 
 	if(trivia.askedQuestions.length < 5){
+		
 	
 		userChoice = trivia.option2;
 		// Check if user chose the correct answer 
@@ -357,8 +423,13 @@ window.onload = function(){
 
 
 	$("#option3").on("click", function(){
+		//clear content on time remaining 
+		$("#timeRemaining").empty();
+		// set count to 0 so to avoid writing to #timeRemaining
+		trivia.count = 0;	
 
 	if(trivia.askedQuestions.length < 5){
+		
 
 		userChoice = trivia.option3;
 
@@ -456,6 +527,7 @@ window.onload = function(){
 		trivia.askedQuestions = [];
 		$("#option2").removeClass("btn-danger");
 		trivia.choices();
+		trivia.count = 10;
 	}	
 	
 	
