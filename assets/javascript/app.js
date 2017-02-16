@@ -38,7 +38,10 @@ var trivia = {
 	askedQuestions: [],
 	questionAnswered: false,
 	count: 10,
+	counter: 0,
 	unanswered: 0,
+	clicked: false,
+
 	//methods
 	start: function(){
 		$("#start").show();
@@ -59,6 +62,7 @@ var trivia = {
 		$("#option2").removeClass("btn-success");
 		$("#option3").html(option3);
 	},
+
 	finalScreen: function(){
 		$("#question").html("Score: ");
 		$("#option1").removeClass("btn-info");
@@ -70,9 +74,12 @@ var trivia = {
 		$("#timeRemaining").empty();
 		$("#unanswered").show();
 		$("#unanswered").html("Unanswered questions: " + trivia.unanswered);
+		trivia.clicked = false;
 	},
-
+	//function to choose random question 
 	choices:function(){	
+		//clear interval so it would not increase the speed of the timer
+		clearInterval(trivia.counter);
 
 		//pick a random number betwen 1 and 5 
 		trivia.randomQuestion = Math.floor(Math.random() * 6);
@@ -148,25 +155,26 @@ var trivia = {
 		//Push the random question into the asked questions array 
 		trivia.askedQuestions.push(trivia.randomQuestion);
 		console.log(trivia.question);
+		//reset timer counter to 10
 		trivia.count = 10;
-}
-		
+		//start timer 
+		trivia.counter = setInterval(trivia.timer, 1000);
+		//write time remaining every second
+		$("#timeRemaining").html("Time Remaining " + trivia.count + " seconds" );
+		setTimeout(function(){
+			$(".btn").removeAttr("disabled");
+			trivia.clicked = false;
+			}
+			, 500);
+	},
 
-};
-
-//once doc is loaded start functionality
-window.onload = function(){	
-
-	userChoice = "";
-	var counter;
-
-	//timer function
-	function timer(){
+		//timer function
+	timer: function(){
 		trivia.count -= 1;
 		if(trivia.count === 0){
 			trivia.unanswered++;
+			//display time is up if timer euqals 0
 			$("#timeRemaining").html("Time is up");
-			//clearInerval(counter);
 			//Show the correct answer if the time is up 
 			switch(trivia.randomQuestion){
 			case 1:	
@@ -197,18 +205,38 @@ window.onload = function(){
 		setTimeout(function(){
 				$("#timeRemaining").empty();
 				trivia.choices();
-			}, 3000)
+			}, 2000)
 		} //closing bracket for trivia.askedQuestions length equals  0
 
-		}// closing bracket for if trivia count equals 0
-		if(trivia.count > 0){
-		$("#timeRemaining").html("Time Remaining " + trivia.count + " seconds" );
-		}
-		}
-	//counter variable to call timer function every second
-	
+	}// closing bracket for if trivia count equals 0
 
-	//start 
+	if(trivia.count > 0){
+		$("#timeRemaining").html("Time Remaining " + trivia.count + " seconds" );
+	}
+},//timer function closing bracket
+	
+	reset: function() {
+		trivia.correctAnswers = 0
+		trivia.incorrectAnswers = 0
+		trivia.askedQuestions = [];
+		$("#option2").removeClass("btn-danger");
+		trivia.choices();
+		trivia.count = 10;
+		$("#unanswered").hide();
+		trivia.unanswered = 0;
+		trivia.clicked = false;
+	}
+		
+
+};
+
+//***********************once document is loaded start functionality*******************************//
+window.onload = function(){	
+
+	//Global variables
+	var userChoice = "";
+
+	//Display only the start button
 	trivia.start();	
 	
 	$("#start").on("click", function(){
@@ -218,115 +246,119 @@ window.onload = function(){
 		$("#option1").show();
 		$("#option2").show();
 		$("#option3").show();
-
-		counter = setInterval(timer, 1000);
-
+		$("#timeRemaining").html("Time Remaining " + trivia.count + " seconds" );
 	});
 
+	//Event listeners for the 3 options given as possible answers
+	
+		$("#option1").on("click", function(){
 
-	$("#option1").on("click", function(){
-		//clear content on time remaining 
-		$("#timeRemaining").empty();
-		// set count to 0 so to avoid writing to #timeRemaining
-		trivia.count = 0;	
-
-
-		if(trivia.askedQuestions.length < 5){
-			
+		if(trivia.clicked === false) {
+			//clear content on time remaining 
+			$("#timeRemaining").empty();
+			// set count to 0 so to avoid writing to #timeRemaining see timer function
+			trivia.count = 0;	
+		
+			//check that not all the questions have been asked 
+			if(trivia.askedQuestions.length < 5){		
 			//Get user choice
 			userChoice = trivia.option1;
 			console.log(userChoice);
 
-		// Check if user chose the correct answer 
-		if(trivia.randomQuestion === 1){
-			if(trivia.answer1 === userChoice){
-				$("#question").html("Correct!")
-				trivia.correctAnswers ++;
-				setTimeout(trivia.choices, 2000);	
+			// Check if user chose the correct answer 
+			if(trivia.randomQuestion === 1){
+				if(trivia.answer1 === userChoice){
+					$("#question").html("Correct!")
+					trivia.correctAnswers ++;
+					setTimeout(trivia.choices, 2000);	
+				}
+				else{
+					$("#question").html("Better luck next time")
+					trivia.incorrectAnswers ++;
+					setTimeout(function(){
+						$("#question").html("The correct answer is : " + trivia.answer1);},1000);
+					setTimeout(trivia.choices, 3000);
+				}
+					
 			}
-			else{
-				$("#question").html("Better luck next time")
-				trivia.incorrectAnswers ++;
-				setTimeout(function(){
-					$("#question").html("The correct answer is : " + trivia.answer1);},1000);
-				setTimeout(trivia.choices, 3000);
-			}
-				
-		}
-		else if(trivia.randomQuestion === 2){
-			if(trivia.answer2 === userChoice){
-				$("#question").html("Correct!")
-				trivia.correctAnswers ++;
-				setTimeout(trivia.choices, 2000);
-			}
-			else{
-				$("#question").html("Better luck next time")
-				trivia.incorrectAnswers ++;
-				setTimeout(function(){
-					$("#question").html("The correct answer is : " + trivia.answer2);},1000);
-				setTimeout(trivia.choices, 3000);
-			}
-		
-		}
-
-		else if(trivia.randomQuestion === 3){
-			if(trivia.answer3 === userChoice){
-				$("#question").html("Correct!")
-				trivia.correctAnswers ++;
-				setTimeout(trivia.choices, 2000);
-			}
-			else{
-				$("#question").html("Better luck next time")
-				trivia.incorrectAnswers ++;
-				setTimeout(function(){
-					$("#question").html("The correct answer is : " + trivia.answer3);},1000);
-				setTimeout(trivia.choices, 3000);
-			}
-		
-		
-		}
-
-		else if(trivia.randomQuestion === 4){
-			if(trivia.answer4 === userChoice){
-				$("#question").html("Correct!")
-				trivia.correctAnswers ++;		
-				setTimeout(trivia.choices, 2000);
-			}
-			else{
-				$("#question").html("Better luck next time")
-				trivia.incorrectAnswers ++;
-				setTimeout(function(){
-					$("#question").html("The correct answer is : " + trivia.answer4);},1000);
-				setTimeout(trivia.choices, 3000);
-			}
-		
-		}
-
-		else if(trivia.randomQuestion === 5){
-			if(trivia.answer5 === userChoice){
-				$("#question").html("Correct!")
-				trivia.correctAnswers ++;
-				setTimeout(trivia.choices, 2000);
-			}
-			else{
-				$("#question").html("Better luck next time")
-				trivia.incorrectAnswers ++;
-				setTimeout(function(){
-					$("#question").html("The correct answer is : " + trivia.answer5);},1000);
-				setTimeout(trivia.choices, 3000);
+			else if(trivia.randomQuestion === 2){
+				if(trivia.answer2 === userChoice){
+					$("#question").html("Correct!")
+					trivia.correctAnswers ++;
+					setTimeout(trivia.choices, 2000);
+				}
+				else{
+					$("#question").html("Better luck next time")
+					trivia.incorrectAnswers ++;
+					setTimeout(function(){
+						$("#question").html("The correct answer is : " + trivia.answer2);},1000);
+					setTimeout(trivia.choices, 3000);
 				}
 			
 			}
-		}
-		else{
-		trivia.finalScreen();
+
+			else if(trivia.randomQuestion === 3){
+				if(trivia.answer3 === userChoice){
+					$("#question").html("Correct!")
+					trivia.correctAnswers ++;
+					setTimeout(trivia.choices, 2000);
+				}
+				else{
+					$("#question").html("Better luck next time")
+					trivia.incorrectAnswers ++;
+					setTimeout(function(){
+						$("#question").html("The correct answer is : " + trivia.answer3);},1000);
+					setTimeout(trivia.choices, 3000);
+				}
+			
+			
 			}
-	});
+
+			else if(trivia.randomQuestion === 4){
+				if(trivia.answer4 === userChoice){
+					$("#question").html("Correct!")
+					trivia.correctAnswers ++;		
+					setTimeout(trivia.choices, 2000);
+				}
+				else{
+					$("#question").html("Better luck next time")
+					trivia.incorrectAnswers ++;
+					setTimeout(function(){
+						$("#question").html("The correct answer is : " + trivia.answer4);},1000);
+					setTimeout(trivia.choices, 3000);
+				}
+			
+			}
+
+			else if(trivia.randomQuestion === 5){
+				if(trivia.answer5 === userChoice){
+					$("#question").html("Correct!")
+					trivia.correctAnswers ++;
+					setTimeout(trivia.choices, 2000);
+				}
+				else{
+					$("#question").html("Better luck next time")
+					trivia.incorrectAnswers ++;
+					setTimeout(function(){
+						$("#question").html("The correct answer is : " + trivia.answer5);},1000);
+					setTimeout(trivia.choices, 3000);
+					}
+				
+				}
+			}
+			else{
+			trivia.finalScreen();
+				}
+			}
+			trivia.clicked = true;
+
+		});
 
 	$("#option2").on("click", function(){
+	if(trivia.clicked === false) {
 		//clear content on time remaining 
 		$("#timeRemaining").empty();
-		// set count to 0 so to avoid writing to #timeRemaining
+		// set count to 0 so to avoid writing to #timeRemaining see timer function
 		trivia.count = 0;	
 
 	if(trivia.askedQuestions.length < 5){
@@ -419,118 +451,120 @@ window.onload = function(){
 		trivia.finalScreen();
 	}
 
+	}
+	trivia.clicked = true;
 	});
 
 
 	$("#option3").on("click", function(){
+	
+	if(trivia.clicked === false){
 		//clear content on time remaining 
 		$("#timeRemaining").empty();
-		// set count to 0 so to avoid writing to #timeRemaining
+		// set count to 0 so to avoid writing to #timeRemaining see timer function
 		trivia.count = 0;	
 
-	if(trivia.askedQuestions.length < 5){
-		
-
-		userChoice = trivia.option3;
-
-		// Check if user chose the correct answer 
-	if(trivia.randomQuestion === 1){
-		if(trivia.answer1 === userChoice){
-			$("#question").html("Correct!")
-			trivia.correctAnswers ++;
-			setTimeout(trivia.choices, 2000);
-		}
-		else{
-			$("#question").html("Better luck next time")
-			trivia.incorrectAnswers ++;
-			setTimeout(function(){
-				$("#question").html("The correct answer is : " + trivia.answer1);},1000);
-			setTimeout(trivia.choices, 3000);
-		}
-
-	}
-
-	else if(trivia.randomQuestion === 2){
-		if(trivia.answer2 === userChoice){
-			$("#question").html("Correct!")
-			trivia.correctAnswers ++;
-			setTimeout(trivia.choices, 2000);	
-		}
-		else{
-			$("#question").html("Better luck next time")
-			trivia.incorrectAnswers ++;
-			setTimeout(function(){
-				$("#question").html("The correct answer is : " + trivia.answer2);},1000);
-			setTimeout(trivia.choices, 3000);
-		}
 	
+		if(trivia.askedQuestions.length < 5){
+			
+			userChoice = trivia.option3;
 
-	}
+			// Check if user chose the correct answer 
+		if(trivia.randomQuestion === 1){
 
-	else if(trivia.randomQuestion === 3){
-		if(trivia.answer3 === userChoice){
-			$("#question").html("Correct!")
-			trivia.correctAnswers ++;
-			setTimeout(trivia.choices, 2000);
-		}
-		else{
-			$("#question").html("Better luck next time")
-			trivia.incorrectAnswers ++;
-			setTimeout(function(){
-				$("#question").html("The correct answer is : " + trivia.answer3);},1000);
-			setTimeout(trivia.choices, 3000);
-		}
-				
-	}
+			if(trivia.answer1 === userChoice){
+				$("#question").html("Correct!")
+				trivia.correctAnswers ++;
+				setTimeout(trivia.choices, 2000);
+			}
+			else{
+				$("#question").html("Better luck next time")
+				trivia.incorrectAnswers ++;
+				setTimeout(function(){
+					$("#question").html("The correct answer is : " + trivia.answer1);},1000);
+				setTimeout(trivia.choices, 3000);
+			}
 
-	else if(trivia.randomQuestion === 4){
-		if(trivia.answer4 === userChoice){
-			$("#question").html("Correct!")
-			trivia.correctAnswers ++;
-			setTimeout(trivia.choices, 3000);	
-		}
-		else{
-			$("#question").html("Better luck next time")
-			trivia.incorrectAnswers ++;
-			setTimeout(function(){
-				$("#question").html("The correct answer is : " + trivia.answer4);},1000);
-			setTimeout(trivia.choices, 3000);
-		}
+			}
+
+			else if(trivia.randomQuestion === 2){
+				if(trivia.answer2 === userChoice){
+					$("#question").html("Correct!")
+					trivia.correctAnswers ++;
+					setTimeout(trivia.choices, 2000);	
+				}
+				else{
+					$("#question").html("Better luck next time")
+					trivia.incorrectAnswers ++;
+					setTimeout(function(){
+						$("#question").html("The correct answer is : " + trivia.answer2);},1000);
+					setTimeout(trivia.choices, 3000);
+				}
+			
+
+			}
+
+			else if(trivia.randomQuestion === 3){
+				if(trivia.answer3 === userChoice){
+					$("#question").html("Correct!")
+					trivia.correctAnswers ++;
+					setTimeout(trivia.choices, 2000);
+				}
+				else{
+					$("#question").html("Better luck next time")
+					trivia.incorrectAnswers ++;
+					setTimeout(function(){
+						$("#question").html("The correct answer is : " + trivia.answer3);},1000);
+					setTimeout(trivia.choices, 3000);
+				}
+						
+			}
+
+			else if(trivia.randomQuestion === 4){
+				if(trivia.answer4 === userChoice){
+					$("#question").html("Correct!")
+					trivia.correctAnswers ++;
+					setTimeout(trivia.choices, 3000);	
+				}
+				else{
+					$("#question").html("Better luck next time")
+					trivia.incorrectAnswers ++;
+					setTimeout(function(){
+						$("#question").html("The correct answer is : " + trivia.answer4);},1000);
+					setTimeout(trivia.choices, 3000);
+				}
+			
+			}
+
+			else if(trivia.randomQuestion === 5){
+				if(trivia.answer5 === userChoice){
+					$("#question").html("Correct!")
+					trivia.correctAnswers ++;		
+					setTimeout(trivia.choices, 3000);
+				}
+				else{
+					$("#question").html("Better luck next time")
+					trivia.incorrectAnswers ++;
+					setTimeout(function(){
+						$("#question").html("The correct answer is : " + trivia.answer5);},1000);
+					setTimeout(trivia.choices, 3000);
+				}
+			
+			}		
+
+			}
+			else{
+				trivia.finalScreen();
+			}
+
 	
-	}
+	}// if trivia clicked is false
 
-	else if(trivia.randomQuestion === 5){
-		if(trivia.answer5 === userChoice){
-			$("#question").html("Correct!")
-			trivia.correctAnswers ++;		
-			setTimeout(trivia.choices, 3000);
-		}
-		else{
-			$("#question").html("Better luck next time")
-			trivia.incorrectAnswers ++;
-			setTimeout(function(){
-				$("#question").html("The correct answer is : " + trivia.answer5);},1000);
-			setTimeout(trivia.choices, 3000);
-		}
+	trivia.clicked = true;
 	
+	if(trivia.askedQuestions.length === 5){
+		trivia.reset();
 	}		
-
-	}
-	else{
-		trivia.finalScreen();
-	}
-
-
-	if(trivia.askedQuestions.length == 5){
-		trivia.correctAnswers = 0
-		trivia.incorrectAnswers = 0
-		trivia.askedQuestions = [];
-		$("#option2").removeClass("btn-danger");
-		trivia.choices();
-		trivia.count = 10;
-	}	
-	
-	
 	});
 
 
